@@ -5,7 +5,7 @@
 THREE.TrackballControls = function ( object, domElement ) {
 
 	var _this = this,
-	STATE = { NONE : -1, ROTATE : 0, ZOOM : 1, PAN : 2 };
+	STATE = { NONE : -1, ROTATE : 0, PAN : 1, ZOOM : 2 };
 
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
@@ -137,10 +137,10 @@ THREE.TrackballControls = function ( object, domElement ) {
 	};
 
 	this.zoomCamera = function() {
+    //var factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * _this.zoomSpeed;
+   var factor = ( _zoomEnd.y - _zoomStart.y ); // just pass the value
 
-		var factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * _this.zoomSpeed;
-
-		if ( factor !== 1.0 && factor > 0.0 ) {
+		if ( factor !== 1.0 && factor > 0.0) {
 
 			_eye.multiplyScalar( factor );
 
@@ -281,6 +281,31 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	};
 
+  function mousewheel( event ) {
+
+    if ( ! _this.enabled ) return;
+
+    var y;
+    if ( event.shiftKey ) {
+      y = ( event.wheelDelta > 0 ? 1.05 : 0.95 );
+    } else {
+      y = ( event.wheelDelta > 0 ? 1.005 : 0.995 );
+    }
+
+    _zoomEnd = new THREE.Vector2(
+      0.0,
+      2*y
+		);
+
+    _zoomStart = new THREE.Vector2(
+      0.0,
+      y
+		);
+
+
+  }
+
+
 	function mousedown( event ) {
 
 		if ( ! _this.enabled ) return;
@@ -296,11 +321,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 				_rotateStart = _rotateEnd = _this.getMouseProjectionOnBall( event.clientX, event.clientY );
 
-			} else if ( _state === STATE.ZOOM && !_this.noZoom ) {
-
-				_zoomStart = _zoomEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
-
-			} else if ( !this.noPan ) {
+			} else if ( _state === STATE.PAN &&  !this.noPan ) {
 
 				_panStart = _panEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
 
@@ -332,10 +353,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			_rotateEnd = _this.getMouseProjectionOnBall( event.clientX, event.clientY );
 
-		} else if ( _state === STATE.ZOOM && !_this.noZoom ) {
-
-			_zoomEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
-
 		} else if ( _state === STATE.PAN && !_this.noPan ) {
 
 			_panEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
@@ -359,6 +376,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.domElement.addEventListener( 'mousemove', mousemove, false );
 	this.domElement.addEventListener( 'mousedown', mousedown, false );
+  this.domElement.addEventListener( 'mousewheel', mousewheel, false );
+  this.domElement.addEventListener( 'DOMMouseScroll', mousewheel, false );
+
 	this.domElement.addEventListener( 'mouseup', mouseup, false );
 
 	window.addEventListener( 'keydown', keydown, false );
