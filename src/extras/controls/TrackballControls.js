@@ -287,9 +287,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 
     var y;
     if ( event.shiftKey ) {
-      y = ( event.wheelDelta > 0 ? 1.05 : 0.95 );
+      y = ( event.wheelDelta > 0 ? 0.995 : 1.010  );
     } else {
-      y = ( event.wheelDelta > 0 ? 1.005 : 0.995 );
+      y = ( event.wheelDelta > 0 ? 0.95 : 1.10 );
     }
 
     _zoomEnd = new THREE.Vector2(
